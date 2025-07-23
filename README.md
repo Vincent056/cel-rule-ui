@@ -27,6 +27,63 @@ npm run dev
 
 The application will be available at `http://localhost:5173` (or another port if 5173 is in use).
 
+## Running with Podman
+
+You can run the pre-built container image using Podman:
+
+### Pull and Run
+
+```bash
+# Pull the latest image
+podman pull ghcr.io/vincent056/cel-rule-ui:latest
+
+# Run with default settings (connects to localhost:8090)
+podman run -p 8080:8080 ghcr.io/vincent056/cel-rule-ui:latest
+```
+
+### Custom RPC Server URL
+
+If your CEL RPC server is running on a different host/port:
+
+```bash
+# Run with custom RPC server URL
+podman run -p 8080:8080 \
+  -e VITE_RPC_BASE_URL=http://your-server:8090 \
+  ghcr.io/vincent056/cel-rule-ui:latest
+```
+
+### Using Podman Compose
+
+Create a `compose.yml` file:
+
+```yaml
+services:
+  cel-rule-ui:
+    image: ghcr.io/vincent056/cel-rule-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - VITE_RPC_BASE_URL=http://localhost:8090
+```
+
+Then run:
+
+```bash
+podman-compose up
+```
+
+### Build Locally with Podman
+
+```bash
+# Build the image
+podman build -t cel-rule-ui .
+
+# Run your local build
+podman run -p 8080:8080 cel-rule-ui
+```
+
+The application will be available at `http://localhost:8080`.
+
 ## Usage
 
 ### General Chat Mode

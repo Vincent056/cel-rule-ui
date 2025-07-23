@@ -167,16 +167,16 @@ export function useChat() {
       })
 
       // Add rule generation context if needed
-      if (input.toLowerCase().includes('rule') || input.toLowerCase().includes('create') || input.toLowerCase().includes('generate')) {
-        const ruleContext = create(RuleGenerationContextSchema, {
-          resourceType: 'Pod',
-          apiVersion: 'v1',
-          namespace: 'default',
-          validationIntent: input,
-          useLiveCluster: false,
-        })
-        request.context = { case: 'ruleContext', value: ruleContext }
-      }
+      // if (input.toLowerCase().includes('rule') || input.toLowerCase().includes('create') || input.toLowerCase().includes('generate')) {
+      //   const ruleContext = create(RuleGenerationContextSchema, {
+      //     resourceType: '',
+      //     apiVersion: '',
+      //     namespace: '',
+      //     validationIntent: input,
+      //     useLiveCluster: false,
+      //   })
+      //   request.context = { case: 'ruleContext', value: ruleContext }
+      // }
 
       addLog('debug', 'Sending Connect-RPC request', { request })
 
