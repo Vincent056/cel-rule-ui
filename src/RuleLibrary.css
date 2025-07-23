@@ -1,0 +1,135 @@
+/* Rule Library Component Styles - Most styling is done with Tailwind classes */
+
+/* Custom scrollbar for better appearance */
+.rule-library ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.rule-library ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.rule-library ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.rule-library ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Line clamp utilities for older browsers */
+.line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* Legacy styles for dialogs - to be replaced with shadcn/ui Dialog component */
+.rule-library-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dialog-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dialog-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    font-family: monospace;
+}
+
+.tag-input {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    background-color: #e0e0e0;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.test-case-item {
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.test-case-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
