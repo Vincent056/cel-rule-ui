@@ -12,7 +12,9 @@ A single-page React application that provides an AI-powered chat interface for g
 
 ## Prerequisites
 
-1. The CEL RPC server must be running on `http://localhost:8090`
+1. The CEL RPC server must be running (default: `http://localhost:8349`)
+   - Backend server repository: https://github.com/vincent056/cel-rpc-server
+
 2. Node.js and npm installed
 
 ## Installation
@@ -27,11 +29,61 @@ npm run dev
 
 The application will be available at `http://localhost:5173` (or another port if 5173 is in use).
 
-## Running with Podman
+## Quick Start with Docker/Podman
 
-You can run the pre-built container image using Podman:
+The easiest way to run the Chat UI is using the provided script:
 
-### Pull and Run
+```bash
+# Run with default settings (connects to localhost:8349)
+./run-dev.sh
+
+# Run with custom RPC server URL
+./run-dev.sh http://your-rpc-server:8349
+
+# Run with custom RPC server URL and port
+./run-dev.sh http://your-rpc-server:8349 8080
+```
+
+## Running with Docker/Podman (Manual)
+
+### Development Mode
+
+For development and testing, you can build and run the UI with hot-reload:
+
+```bash
+# Build the development image
+podman build -t cel-chat-ui:dev .
+
+# Run with default settings (connects to localhost:8349)
+podman run -p 5173:5173 --name cel-chat-ui cel-chat-ui:dev
+
+# Run with custom RPC server URL (environment variable is picked up at runtime)
+podman run -p 5173:5173 --name cel-chat-ui --replace \
+  -e VITE_RPC_BASE_URL=http://your-server:8349 \
+  cel-chat-ui:dev
+
+# Example: Connect to RPC server running in another container
+podman run -p 5173:5173 --name cel-chat-ui \
+  -e VITE_RPC_BASE_URL=http://host.containers.internal:8349 \
+  cel-chat-ui:dev
+
+# Example: Connect to RPC server on a different host
+podman run -p 5173:5173 --name cel-chat-ui \
+  -e VITE_RPC_BASE_URL=http://192.168.1.100:8349 \
+  cel-chat-ui:dev
+```
+
+The development server will show the configured URL in the startup logs:
+```
+Starting development server with:
+  VITE_RPC_BASE_URL=http://your-server:8349
+```
+
+Access the UI at `http://localhost:5173`
+
+### Production Mode (Pre-built)
+
+You can also run the pre-built production container image:
 
 ```bash
 # Pull the latest image
@@ -39,37 +91,55 @@ podman pull ghcr.io/vincent056/cel-rule-ui:latest
 
 # Run with default settings (connects to localhost:8090)
 podman run -p 8080:8080 ghcr.io/vincent056/cel-rule-ui:latest
-```
 
-### Custom RPC Server URL
-
-If your CEL RPC server is running on a different host/port:
-
-```bash
 # Run with custom RPC server URL
 podman run -p 8080:8080 \
   -e VITE_RPC_BASE_URL=http://your-server:8090 \
   ghcr.io/vincent056/cel-rule-ui:latest
 ```
 
-### Using Podman Compose
+## Complete System Setup (Backend + Frontend)
 
-Create a `compose.yml` file:
+The CEL Rule Assistant consists of two components:
 
-```yaml
-services:
-  cel-rule-ui:
-    image: ghcr.io/vincent056/cel-rule-ui:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - VITE_RPC_BASE_URL=http://localhost:8090
+1. **Backend Server (cel-rpc-server)**: AI-powered CEL rule generation server
+   - Repository: https://github.com/vincent056/cel-rpc-server
+   - Location: `../cel-rpc-server/`
+   - Default port: 8349
+
+2. **Frontend UI (chat-ui)**: React-based chat interface
+   - Repository: [current repository]
+   - Location: `./`
+   - Default port: 5173
+
+### Running Both Components
+
+#### Option 1: Using Containers
+```bash
+# Terminal 1: Start the backend server
+cd ../cel-rpc-server
+podman run -d --name cel-rpc-server \
+  -p 8349:8349 \
+  -e OPENAI_API_KEY=your-api-key \
+  -v ~/.kube/config:/KUBECONFIG/kubeconfig:Z \
+  ghcr.io/vincent056/cel-rpc-server
+
+# Terminal 2: Start the frontend UI
+cd ../chat-ui
+./run-dev.sh http://localhost:8349
 ```
 
-Then run:
-
+#### Option 2: Running Locally
 ```bash
-podman-compose up
+# Terminal 1: Start the backend server
+cd ../cel-rpc-server
+export OPENAI_API_KEY=your-api-key
+go run cmd/server/*.go
+
+# Terminal 2: Start the frontend UI
+cd ../chat-ui
+npm install
+npm run dev
 ```
 
 ### Build Locally with Podman

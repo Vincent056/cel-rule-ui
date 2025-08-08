@@ -1,37 +1,41 @@
-# --- Build Stage ---
-FROM node:20-alpine AS builder
+# TODO: In the future, create a production build with nginx to host the built UI
+# For now, using development server for convenience
+
+# --- Development Stage ---
+FROM registry.access.redhat.com/ubi9/ubi:latest
+
+# Install Node.js 20
+RUN dnf module install -y nodejs:20 && \
+    dnf clean all
+
+# Create app user
+RUN useradd -u 1001 -m -s /bin/bash appuser
 
 WORKDIR /app
 
-# Install deps first (leveraging Docker layer caching)
+# Copy package files
 COPY package.json package-lock.json* ./
+
+# Install dependencies as root (for global packages if needed)
 RUN npm ci --prefer-offline --no-audit --progress=false
 
-# Copy source
+# Copy source code
 COPY . .
 
-# Build UI (allows overriding API endpoint at build time via VITE_CEL_RPC_ENDPOINT)
-ARG VITE_CEL_RPC_ENDPOINT=/mcp
-ENV VITE_CEL_RPC_ENDPOINT=${VITE_CEL_RPC_ENDPOINT}
-RUN npm run build
+# Make entrypoint script executable
+RUN chmod +x /app/docker/dev-entrypoint.sh
 
-# --- Runtime Stage ---
-FROM nginx:alpine AS runtime
+# Change ownership to app user
+RUN chown -R appuser:appuser /app
 
-# Copy build output to nginx html dir
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Switch to non-root user
+USER appuser
 
+# Set default environment variables (can be overridden at runtime)
+ENV VITE_RPC_BASE_URL=http://localhost:8349
 
-# Copy nginx config to serve UI and allow SPA routing
-COPY --from=builder /app/docker/nginx.conf /etc/nginx/conf.d/default.conf
+# Expose the dev server port
+EXPOSE 5173
 
-# Copy entrypoint script for runtime configuration
-COPY --from=builder /app/docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Set default VITE_RPC_BASE_URL (can be overridden at runtime)
-ENV VITE_RPC_BASE_URL=http://localhost:8080
-
-EXPOSE 8080
-
-ENTRYPOINT ["/entrypoint.sh"]
+# Use the entrypoint script
+ENTRYPOINT ["/app/docker/dev-entrypoint.sh"]
